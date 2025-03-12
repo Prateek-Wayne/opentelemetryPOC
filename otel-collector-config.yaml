@@ -16,7 +16,7 @@ exporters:
     namespace: default
   # This exposes metrics in Prometheus format
   loki:
-    endpoint: 'http://loki:3100/loki/api/v1/push'
+    endpoint: http://loki:3100/otlp
 
 service:
   pipelines:
