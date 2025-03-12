@@ -1,0 +1,38 @@
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    jaeger:
+      protocols:
+        grpc:
+        thrift_binary:
+        thrift_compact:
+        thrift_http:
+    otlp:
+      protocols:
+        grpc:
+        http:
+    zipkin:
+      port: 9411
+    prometheus:
+      remote_write:
+        - url: http://localhost:9090/api/v1/write
+
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+
+compactor:
+  compaction:
+    block_retention: 48h
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo/traces
