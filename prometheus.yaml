@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 1s
+
+scrape_configs:
+  - job_name: "otlp"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["otel-collector:8889"]
+
+
