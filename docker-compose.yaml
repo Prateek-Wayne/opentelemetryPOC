@@ -1,15 +1,69 @@
-services:
-  backend:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/home
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-    networks:
-      - fastapi-network
+version: '3.8'
 
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+      - redis
+    volumes:
+      - ./api:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://rabbitmq:5672
+      - CELERY_RESULT_BACKEND=redis://redis
+      - HOST=0.0.0.0
+      - PORT=8081
+    command: uvicorn api:app --host 0.0.0.0 --port 8081
+
+  worker_add:
+    build:
+      context: ./services/add
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - redis
+    environment:
+      - CELERY_BROKER_URL=amqp://rabbitmq:5672
+      - CELERY_RESULT_BACKEND=redis://redis
+    volumes:
+      - ./services/add:/worker
+    command: celery -A worker worker --loglevel=info -Q queue_add --concurrency=2
+
+  worker_multiply:
+    build:
+      context: ./services/multiply
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - redis
+    environment:
+      - CELERY_BROKER_URL=amqp://rabbitmq:5672
+      - CELERY_RESULT_BACKEND=redis://redis
+    volumes:
+      - ./services/multiply:/worker
+    command: celery -A worker worker --loglevel=info -Q queue_multiply --concurrency=4
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
+  redis:
+    image: redis:latest
+
+  # Optionally, you can also include Flower for monitoring the Celery tasks
+  flower:
+    image: mher/flower
+    command: celery --broker=amqp://rabbitmq:5672 flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbitmq
   otel-collector:
     image: otel/opentelemetry-collector-contrib
     volumes:
@@ -23,7 +77,7 @@ services:
       - 4318:4318 # OTLP http receiver
       - 55679:55679 # zpages extension
     networks:
-      - fastapi-network
+      - default
     depends_on:
       - loki
   loki:
@@ -34,7 +88,7 @@ services:
       - ./loki-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - fastapi-network
+      - default
 
   prometheus:
     image: prom/prometheus
@@ -43,7 +97,7 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - fastapi-network
+      - default
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -51,9 +105,11 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
-      - fastapi-network
+      - default
   
-networks:
-  fastapi-network:
 volumes:
   loki-data:
+
+networks:
+  default:
+    driver: bridge
