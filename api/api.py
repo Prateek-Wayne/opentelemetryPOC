@@ -43,7 +43,7 @@ async def add_metrics(request, call_next):
 # Initialize OpenTelemetry Tracer
 tracer = init_tracer("fastapi_service")
 
-# Initialize OpenTelemetry Metrics
+# Initialize OpenTelemetry Metrics22
 user_request_count, request_duration_histogram = init_meter("fastapi_service")
 
 @app.middleware("http")

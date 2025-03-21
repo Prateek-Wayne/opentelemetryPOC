@@ -1,0 +1,18 @@
+auth_enabled: false
+server:
+  http_listen_port: 3200
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "tempo:4317"
+storage:
+  trace:
+    backend: local # backend configuration to use
+    wal:
+      path: /var/tempo/wal # where to store the wal locally
+    local:
+      path: /var/tempo/blocks

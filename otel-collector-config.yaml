@@ -15,19 +15,18 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
     namespace: prateek_crud_app
-  # This exposes metrics in Prometheus format
-  # loki:
-  #   endpoint: 'http://loki:3100/loki/api/v1/push'
-  #   tls:
-  #     insecure: true
+  otlp:
+    endpoint: "tempo:4317" # ✅ Export to Tempo using OTLP
+    tls:
+      insecure: true # ✅ Required if Tempo does not use TLS
 
 service:
   pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp] # ✅ Send traces to Tempo using OTLP
     metrics:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug, prometheus]
-    # logs:
-    #   receivers: [otlp]
-    #   processors: [batch]
-    #   exporters: [debug, loki]
