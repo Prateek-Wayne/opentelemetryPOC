@@ -1,23 +1,22 @@
-version: '3.8'
-
 services:
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api/Dockerfile
     ports:
       - "8081:8081"
     depends_on:
       - rabbitmq
       - redis
     volumes:
-      - ./api:/app
+      - ./api:/app/api
+      - ./observability:/app/observability
     environment:
       - CELERY_BROKER_URL=amqp://rabbitmq:5672
       - CELERY_RESULT_BACKEND=redis://redis
       - HOST=0.0.0.0
       - PORT=8081
-    command: uvicorn api:app --host 0.0.0.0 --port 8081
+    # command: /bin/sh -c "foreman start -f myprocfile || sleep 2073600”
 
   worker_add:
     build:
@@ -64,6 +63,16 @@ services:
       - "5555:5555"
     depends_on:
       - rabbitmq
+
+  loki:
+    image: grafana/loki:3.0.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - default
   otel-collector:
     image: otel/opentelemetry-collector-contrib
     volumes:
@@ -78,18 +87,8 @@ services:
       - 55679:55679 # zpages extension
     networks:
       - default
-    depends_on:
-      - loki
-  loki:
-    image: grafana/loki:main
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - default
-
+    # depends_on:
+    #   - loki
   prometheus:
     image: prom/prometheus
     volumes:
@@ -107,9 +106,6 @@ services:
     networks:
       - default
   
-volumes:
-  loki-data:
-
 networks:
   default:
     driver: bridge

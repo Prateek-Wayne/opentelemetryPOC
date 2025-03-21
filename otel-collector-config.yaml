@@ -5,6 +5,7 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+
 processors:
   batch:
 
@@ -13,10 +14,12 @@ exporters:
     verbosity: detailed
   prometheus:
     endpoint: 0.0.0.0:8889
-    namespace: default
+    namespace: prateek_crud_app
   # This exposes metrics in Prometheus format
-  loki:
-    endpoint: http://loki:3100/otlp
+  # loki:
+  #   endpoint: 'http://loki:3100/loki/api/v1/push'
+  #   tls:
+  #     insecure: true
 
 service:
   pipelines:
@@ -24,7 +27,7 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug, prometheus]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug, loki]
+    # logs:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [debug, loki]

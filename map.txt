@@ -1,0 +1,43 @@
+.
+├── .dockerignore
+├── .gitignore
+├── README.md
+├── api
+│   ├── Dockerfile
+│   ├── __init__.py
+│   ├── api.py
+│   ├── requirements.txt
+│   └── worker.py
+├── demo.svg
+├── docker-compose.yaml
+├── loki-config.yaml
+├── map.txt
+├── observability
+│   ├── __init__.py
+│   ├── monitoring
+│   │   ├── __init__.py
+│   │   └── monitoring.py
+│   └── requirements.txt
+├── otel-collector-config.yaml
+├── prometheus.yaml
+├── services
+│   ├── add
+│   │   ├── Dockerfile
+│   │   ├── __pycache__
+│   │   │   ├── worker.cpython-311.pyc
+│   │   │   └── worker.cpython-39.pyc
+│   │   ├── requirements.txt
+│   │   └── worker.py
+│   └── multiply
+│       ├── Dockerfile
+│       ├── __pycache__
+│       │   ├── worker.cpython-311.pyc
+│       │   └── worker.cpython-39.pyc
+│       ├── requirements.txt
+│       └── worker.py
+└── temp.py
+
+791 directories, 4900 files
+
+
+    # command: opentelemetry-instrument --logs_exporter otlp uvicorn api.api:app --host 0.0.0.0 --port 8081
