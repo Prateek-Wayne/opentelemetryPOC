@@ -30,12 +30,13 @@ async def add_metrics(request, call_next):
     # Extract relevant details
     request_path = request.url.path
     status_code = response.status_code
+    request_method = request.method
 
     # Increment the request counter with attributes
-    user_request_count.add(1, {"route": request_path, "status_code": status_code})
+    user_request_count.add(1, {"route": request_path, "status_code": status_code, "method": request_method})
 
     # Record the duration with attributes
-    request_duration_histogram.record(duration_ms, {"route": request_path, "status_code": status_code})
+    request_duration_histogram.record(duration_ms, {"route": request_path, "status_code": status_code, "method": request_method})
 
     return response
 
