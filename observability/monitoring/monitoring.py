@@ -15,13 +15,13 @@ def init_meter(service_name: str):
     
     # Create metrics (counters, histograms, etc.)
     user_request_count = meter.create_counter(
-        name="prateek_app_user_request_count",
+        name="api_request_count",
         description="Counts the requests to user-service",
         unit="1"
     )
 
     request_duration_histogram = meter.create_histogram(
-        name="prateek_app_request_duration",
+        name="api_request_count",
         description="Measures the duration of requests",
         unit="ms"
     )
@@ -43,9 +43,9 @@ def init_meter(service_name: str):
 #     duration_ms = (end_time - start_time) * 1000
 #     request_duration_histogram.record(duration_ms)
 
-if __name__ == "__main__":
-    # Initialize the meter and metrics
-    user_request_count, request_duration_histogram = init_meter("user_service")
+# if __name__ == "__main__":
+#     # Initialize the meter and metrics
+#     user_request_count, request_duration_histogram = init_meter("user_service")
     
     # Simulate a request being handled
     # handle_request()
