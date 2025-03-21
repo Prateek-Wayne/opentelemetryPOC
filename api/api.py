@@ -3,32 +3,40 @@ from fastapi import FastAPI
 from celery.result import AsyncResult, GroupResult
 from celery import group, signature
 from worker import celery_client
-# from ..observability.monitoring.monitoring import init_meter
 from observability.monitoring.monitoring import init_meter
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# from ..observability.monitoring.monitoring import init_meter
 # from observability.monitoring.monitoring import init_meter  # Assuming monitoring.py has the init_meter function
 
 app = FastAPI()
 
+
+# ["opentelemetry-instrument", "--logs_exporter", "otlp", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# opentelemetry-instrument --logs_exporter otlp uvicorn api/api:app --host 0.0.0.0 --port 8000
+# opentelemetry-instrument --logs_exporter otlp uvicorn api:app --host 0.0.0.0 --port 8000
+
 # Initialize the meter and metrics when the app starts
-# user_request_count, request_duration_histogram = init_meter("fastapi_service")
+user_request_count, request_duration_histogram = init_meter("fastapi_service")
 
 
-# @app.middleware("http")
-# async def add_metrics(request, call_next):
-#     # Increment the request counter
-#     user_request_count.add(1)
+@app.middleware("http")
+async def add_metrics(request, call_next):
+    # Increment the request counter
+    user_request_count.add(1)
 
-#     # Start timing the request
-#     start_time = time.time()
+    # Start timing the request
+    start_time = time.time()
     
-#     # Process the request
-#     response = await call_next(request)
+    # Process the request
+    response = await call_next(request)
     
-#     # Measure the request duration
-#     duration_ms = (time.time() - start_time) * 1000
-#     request_duration_histogram.record(duration_ms)
+    # Measure the request duration
+    duration_ms = (time.time() - start_time) * 1000
+    request_duration_histogram.record(duration_ms)
 
-#     return response
+    return response
 
 
 # ----------------------------

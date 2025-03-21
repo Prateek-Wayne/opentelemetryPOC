@@ -43,5 +43,5 @@ ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
 WORKDIR /home/api
 
 # Start the API with OpenTelemetry instrumentation
-CMD opentelemetry-instrument --logs_exporter otlp uvicorn api:app --host ${HOST} --port ${PORT}
+CMD PYTHONPATH=.. opentelemetry-instrument --logs_exporter otlp uvicorn api:app --host ${HOST} --port ${PORT}
 # CMD /bin/sh -c "foreman start -f myprocfile || sleep 2073600"
