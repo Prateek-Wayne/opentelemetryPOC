@@ -92,6 +92,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
@@ -101,10 +102,18 @@ services:
     image: grafana/grafana:latest
     ports:
        - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
       - default
+
+volumes:  
+  grafana-data:
+    driver: local
+  prometheus-data:
+    driver: local
   
 networks:
   default:

@@ -27,25 +27,3 @@ def init_meter(service_name: str):
     )
 
     return user_request_count, request_duration_histogram
-
-# Record request count and duration
-# def handle_request():
-#     # Increment the request counter
-#     user_request_count.add(1)
-    
-#     # Record the request duration
-#     start_time = time.time()  # Start time of the request
-#     # Simulate the operation (e.g., handling a request)
-#     time.sleep(0.5)  # Simulating a request operation that takes 0.5 seconds
-#     end_time = time.time()  # End time of the request
-    
-#     # Calculate the duration in milliseconds and record it in the histogram
-#     duration_ms = (end_time - start_time) * 1000
-#     request_duration_histogram.record(duration_ms)
-
-# if __name__ == "__main__":
-#     # Initialize the meter and metrics
-#     user_request_count, request_duration_histogram = init_meter("user_service")
-    
-    # Simulate a request being handled
-    # handle_request()
