@@ -20,8 +20,8 @@ services:
 
   worker_add:
     build:
-      context: ./services/add
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/add/Dockerfile
     depends_on:
       - rabbitmq
       - redis
@@ -29,13 +29,14 @@ services:
       - CELERY_BROKER_URL=amqp://rabbitmq:5672
       - CELERY_RESULT_BACKEND=redis://redis
     volumes:
-      - ./services/add:/worker
-    command: celery -A worker worker --loglevel=info -Q queue_add --concurrency=2
+      - ./services/add:/worker/services/add
+      - ./observability:/worker/observability
+    # command: celery -A worker worker --loglevel=info -Q queue_add --concurrency=2
 
   worker_multiply:
     build:
-      context: ./services/multiply
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/multiply/Dockerfile
     depends_on:
       - rabbitmq
       - redis
@@ -43,8 +44,9 @@ services:
       - CELERY_BROKER_URL=amqp://rabbitmq:5672
       - CELERY_RESULT_BACKEND=redis://redis
     volumes:
-      - ./services/multiply:/worker
-    command: celery -A worker worker --loglevel=info -Q queue_multiply --concurrency=4
+      - ./services/multiply:/worker/services/multiply
+      - ./observability:/worker/observability
+    # command: celery -A worker worker --loglevel=info -Q queue_multiply --concurrency=4
 
   rabbitmq:
     image: "rabbitmq:3-management"
