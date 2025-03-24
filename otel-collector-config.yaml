@@ -6,6 +6,14 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+  hostmetrics: # New host metrics receiver
+    collection_interval: 60s
+    scrapers:
+      cpu:
+      memory:
+      disk:
+      network:
+
 processors:
   batch:
 
@@ -16,17 +24,17 @@ exporters:
     endpoint: 0.0.0.0:8889
     namespace: prateek_crud_app
   otlp:
-    endpoint: "tempo:4317" # ✅ Export to Tempo using OTLP
+    endpoint: 'tempo:4317'
     tls:
-      insecure: true # ✅ Required if Tempo does not use TLS
+      insecure: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug, otlp] # ✅ Send traces to Tempo using OTLP
+      exporters: [debug, otlp]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, hostmetrics] # Add hostmetrics to the metrics pipeline
       processors: [batch]
       exporters: [debug, prometheus]
