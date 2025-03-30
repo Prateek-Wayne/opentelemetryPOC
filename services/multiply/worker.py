@@ -19,7 +19,7 @@ celery.conf.task_routes = {
 }
 
 # Initialize OpenTelemetry metrics
-user_request_count, request_duration_histogram = init_meter("multiply_service")
+http_requests_total, http_request_duration = init_meter("mulitply_service")
 
 
 @celery.task(name="multiply")
@@ -33,7 +33,7 @@ def multiply(x, y):
     duration_ms = (time.time() - start_time) * 1000
     
     # Record metrics
-    user_request_count.add(1, {"task": "multiply", "status": "completed"})
-    request_duration_histogram.record(duration_ms, {"task": "multiply", "status": "completed"})
+    http_requests_total.add(1, {"task": "multiply", "status": "completed"})
+    http_request_duration.record(duration_ms, {"task": "multiply", "status": "completed"})
     
     return result

@@ -14,16 +14,16 @@ def init_meter(service_name: str):
     meter = meter_provider.get_meter(__name__)
     
     # Create metrics (counters, histograms, etc.)
-    user_request_count = meter.create_counter(
-        name="api_request_count",
+    http_requests_total = meter.create_counter(
+        name="http_requests_total",
         description="Counts the requests to user-service",
         unit="1"
     )
 
-    request_duration_histogram = meter.create_histogram(
-        name="api_request_count",
+    http_request_duration = meter.create_histogram(
+        name="http_request_duration",
         description="Measures the duration of requests",
         unit="ms"
     )
 
-    return user_request_count, request_duration_histogram
+    return http_requests_total, http_request_duration

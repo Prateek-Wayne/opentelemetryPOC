@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = FastAPI()
 
-user_request_count, request_duration_histogram = init_meter("fastapi_service")
+http_requests_total, http_request_duration = init_meter("fastapi_service")
 
 @app.middleware("http")
 async def add_metrics(request, call_next):
@@ -24,12 +24,12 @@ async def add_metrics(request, call_next):
     request_path = request.url.path
     status_code = response.status_code
     request_method = request.method
-    user_request_count.add(1, {"route": request_path, "status_code": status_code, "method": request_method})
-    request_duration_histogram.record(duration_ms, {"route": request_path, "status_code": status_code, "method": request_method})
+    http_requests_total.add(1, {"route": request_path, "status_code": status_code, "method": request_method})
+    http_request_duration.record(duration_ms, {"route": request_path, "status_code": status_code, "method": request_method})
     return response
 
 tracer = init_tracer("fastapi_service")
-user_request_count, request_duration_histogram = init_meter("fastapi_service")
+http_requests_total, http_request_duration = init_meter("fastapi_service")
 
 @app.middleware("http")
 async def add_tracing(request, call_next):
@@ -42,8 +42,8 @@ async def add_tracing(request, call_next):
         span.set_attribute("http.status_code", response.status_code)
         if response.status_code >= 400:
             span.set_status(Status(StatusCode.ERROR))
-        user_request_count.add(1, {"route": request.url.path, "status_code": response.status_code})
-        request_duration_histogram.record(duration_ms, {"route": request.url.path, "status_code": response.status_code})
+        http_requests_total.add(1, {"route": request.url.path, "status_code": response.status_code})
+        http_request_duration.record(duration_ms, {"route": request.url.path, "status_code": response.status_code})
         return response
 
 @app.post("/add")

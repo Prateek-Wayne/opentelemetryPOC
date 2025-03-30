@@ -22,7 +22,7 @@ exporters:
     verbosity: detailed
   prometheus:
     endpoint: 0.0.0.0:8889
-    namespace: prateek_crud_app
+    namespace: app
   otlp:
     endpoint: 'tempo:4317'
     tls:
